@@ -11,9 +11,6 @@ using namespace std;
 
 GLuint VBO;
 
-//Memory position on the GPU
-GLuint gScaleLocation;
-
 //Memory position of World Matrix on the GPU
 GLuint gWorldLocation;
 
@@ -48,28 +45,29 @@ static void RenderSceneCB()
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	//Static scale variable
-	static float Scale = 0.0f;
+	static float Scale = 0.f;
 
 	Scale += 0.001f;
 
-	//Updating the scale value on the GPU
-	glUniform1f(gScaleLocation, sinf(Scale));
+	static float Rotation = 0.f;
+
+	Rotation += 0.001f;
+
 	//Create an identity matrix
 	Matrix4f WorldMatrix;
-	WorldMatrix.m[0][0] = 1.f;
-	WorldMatrix.m[0][1] = 0.f;
+	WorldMatrix.m[0][0] = cosf(Rotation);
+	WorldMatrix.m[0][1] = -sinf(Rotation);
 	WorldMatrix.m[0][2] = 0.f;
 	WorldMatrix.m[0][3] = 0.f;
 
-	WorldMatrix.m[1][0] = 0.f;
-	WorldMatrix.m[1][1] = 1.f;
+	WorldMatrix.m[1][0] = sinf(Rotation);
+	WorldMatrix.m[1][1] = cosf(Rotation);
 	WorldMatrix.m[1][2] = 0.f;
 	WorldMatrix.m[1][3] = 0.f;
 
 	WorldMatrix.m[2][0] = 0.f;
 	WorldMatrix.m[2][1] = 0.f;
-	WorldMatrix.m[2][2] = 1.f;
+	WorldMatrix.m[2][2] = Scale;
 	WorldMatrix.m[2][3] = 0.f;
 
 	WorldMatrix.m[3][0] = 0.f;
@@ -182,9 +180,6 @@ static void CompileShaders()
 	}
 	//Tell OpenGL to use this shader
 	glUseProgram(ShaderProgram);
-
-	//Allocate and get memory location of Scale variable on GPU
-	gScaleLocation = glGetUniformLocation(ShaderProgram, "gScale");
 
 	//Allocate and get memory location of World Matrix on GPU
 	gWorldLocation = glGetUniformLocation(ShaderProgram, "gWorld");
