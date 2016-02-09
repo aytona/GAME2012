@@ -207,6 +207,11 @@ static void CreateVertexBuffer()
 	Vertices[0] = Vector3f(-1.0f, -1.0f, 0.0f);
 	Vertices[1] = Vector3f(1.0f, -1.0f, 0.0f);
 	Vertices[2] = Vector3f(0.0f, 1.0f, 0.0f);
+	
+	for (int i = 0; i < sizeof(vertices) / 12; i++)
+	{
+		vertices[i] = vertices[i] * -1.f;
+	}
 
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
