@@ -18,6 +18,9 @@
     <ClInclude Include="graphicsmath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Transformation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="opengl.cpp">

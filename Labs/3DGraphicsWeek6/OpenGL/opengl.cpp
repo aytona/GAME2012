@@ -6,6 +6,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include "graphicsmath.h"
+#include "Transformation.h"
 
 using namespace std;
 
@@ -55,8 +56,13 @@ static void RenderSceneCB()
 
 	Rotation += 0.001f;
 
+	Transformation transform;
+	transform.Scale(sinf(Scale * 0.1f), sinf(Scale * 0.1f), sinf(Scale * 0.1f));
+	transform.Position(sinf(Scale), 0.0f, 0.0f);
+	transform.Rotation(sinf(Rotation * 90.0f), sinf(Rotation * 90.0f), sinf(Rotation * 90.0f));
+
 	//Create an identity matrix
-	Matrix4f WorldMatrix;
+	/*Matrix4f WorldMatrix;
 	WorldMatrix.m[0][0] = sinf(Scale);
 	WorldMatrix.m[0][1] = 0.f;
 	WorldMatrix.m[0][2] = 0.f;
@@ -75,16 +81,18 @@ static void RenderSceneCB()
 	WorldMatrix.m[3][0] = 0.f;
 	WorldMatrix.m[3][1] = 0.f;
 	WorldMatrix.m[3][2] = 0.f;
-	WorldMatrix.m[3][3] = 1.f;
+	WorldMatrix.m[3][3] = 1.f;*/
 
 	//Update world matrix value on GPU
-	glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, &WorldMatrix.m[0][0]);
+	glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, (const GLfloat*)transform.GetWorldTransformation());
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	//glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
 	glDisableVertexAttribArray(0);
 
@@ -244,6 +252,7 @@ int main(int argc, char** argv)
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	CreateVertexBuffer();
+	CreateIndexBuffer();
 
 	CompileShaders();
 
