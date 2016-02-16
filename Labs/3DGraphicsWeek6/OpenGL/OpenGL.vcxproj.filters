@@ -18,7 +18,7 @@
     <ClInclude Include="graphicsmath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Transformation.h">
+    <ClInclude Include="transformations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

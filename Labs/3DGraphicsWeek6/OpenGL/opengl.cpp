@@ -6,13 +6,13 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include "graphicsmath.h"
-#include "Transformation.h"
+#include "transformations.h"
 
 using namespace std;
 
 GLuint VBO;
-//Memory address on GPU of Index Buffer
 GLuint IBO;
+
 //Memory position of World Matrix on the GPU
 GLuint gWorldLocation;
 
@@ -56,42 +56,20 @@ static void RenderSceneCB()
 
 	Rotation += 0.001f;
 
-	Transformation transform;
+	Transform transform;
 	transform.Scale(sinf(Scale * 0.1f), sinf(Scale * 0.1f), sinf(Scale * 0.1f));
 	transform.Position(sinf(Scale), 0.0f, 0.0f);
-	transform.Rotation(sinf(Rotation * 90.0f), sinf(Rotation * 90.0f), sinf(Rotation * 90.0f));
-
-	//Create an identity matrix
-	/*Matrix4f WorldMatrix;
-	WorldMatrix.m[0][0] = sinf(Scale);
-	WorldMatrix.m[0][1] = 0.f;
-	WorldMatrix.m[0][2] = 0.f;
-	WorldMatrix.m[0][3] = 0.f;
-
-	WorldMatrix.m[1][0] = 0.f;
-	WorldMatrix.m[1][1] = sinf(Scale);
-	WorldMatrix.m[1][2] = 0.f;
-	WorldMatrix.m[1][3] = 0.f;
-
-	WorldMatrix.m[2][0] = 0.f;
-	WorldMatrix.m[2][1] = 0.f;
-	WorldMatrix.m[2][2] = 1.f;
-	WorldMatrix.m[2][3] = 0.f;
-
-	WorldMatrix.m[3][0] = 0.f;
-	WorldMatrix.m[3][1] = 0.f;
-	WorldMatrix.m[3][2] = 0.f;
-	WorldMatrix.m[3][3] = 1.f;*/
+	transform.Rotation(sinf(Rotation) * 90.0f, sinf(Rotation) * 90.0f, sinf(Rotation) * 90.0f);
 
 	//Update world matrix value on GPU
-	glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, (const GLfloat*)transform.GetWorldTransformation());
+	glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, (const GLfloat*)transform.GetWorldTransform());
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	//Bind the Index buffer to the pipeline
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
+	//Draw the indices
 	glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
 	glDisableVertexAttribArray(0);
@@ -205,8 +183,8 @@ static void CreateVertexBuffer()
 {
 	Vector3f Vertices[4];
 	Vertices[0] = Vector3f(-1.0f, -1.0f, 0.0f);
-	Vertices[1] = Vector3f(0.0f, -1.0f, 0.0f);
-	Vertices[2] = Vector3f(1.0f, 1.0f, 0.0f);
+	Vertices[1] = Vector3f(0.0f, -1.0f, 1.0f);
+	Vertices[2] = Vector3f(1.0f, -1.0f, 0.0f);
 	Vertices[3] = Vector3f(0.0f, 1.0f, 0.0f);
 
 	glGenBuffers(1, &VBO);
@@ -216,19 +194,18 @@ static void CreateVertexBuffer()
 
 static void CreateIndexBuffer()
 {
-	//Array of Indices
-	unsigned int Indices[] =
-	{
+	//List of Indices to draw
+	unsigned int Indices[] = {
 		0, 3, 1,
 		1, 3, 2,
 		2, 3, 0,
 		0, 1, 2
 	};
-	//Generate Index Buffer on GPU
+	//Generate Index Buffer
 	glGenBuffers(1, &IBO);
-	//Bind the buffer so that we can use it
+	//Bind buffer to GL Element Array
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-	//Send value of Indices to GPU
+	//Send Indices to GL Element Array
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 }
 
@@ -252,6 +229,7 @@ int main(int argc, char** argv)
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	CreateVertexBuffer();
+
 	CreateIndexBuffer();
 
 	CompileShaders();

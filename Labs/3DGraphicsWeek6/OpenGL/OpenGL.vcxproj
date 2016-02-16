@@ -79,7 +79,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="graphicsmath.h" />
-    <ClInclude Include="Transformation.h" />
+    <ClInclude Include="transformations.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="opengl.cpp" />
