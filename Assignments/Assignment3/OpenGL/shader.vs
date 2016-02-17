@@ -13,5 +13,5 @@ void main()
 		Position.z,
 		1.0);
 
-	Colour = clamp(gWorld), 1.0;
+	Colour = clamp(gWorld, 0.0, 1.0);
 }
