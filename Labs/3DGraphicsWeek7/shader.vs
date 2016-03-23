@@ -13,5 +13,5 @@ void main()
 		Position.z,
 		1.0);
 
-	Colour = gWorld * vec4(clamp(Position, 0.0, 1.0), 1.0);
+	Colour = vec4(clamp(Position, 0.0, 1.0), 1.0);
 }
