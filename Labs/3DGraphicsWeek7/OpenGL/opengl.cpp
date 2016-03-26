@@ -60,7 +60,7 @@ static void RenderSceneCB()
 	Rotation += 0.001f;
 
 	Transform transform;
-	transform.Position(-1.5f, -1.0f, 5.0f);
+	transform.Position(-1.5f, -1.0f, sinf(Scale * 10.f) + 5.f);
 	transform.SetPerspective(90.f, 1024, 768, 1.f, 1000.f);
 	transform.SetCamera(*gameCamera);
 
@@ -219,7 +219,7 @@ int main(int argc, char** argv)
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize(1024, 768);
 	glutInitWindowPosition(100, 100);
-	glutCreateWindow("Tutorial 03");
+	glutCreateWindow("Assignment 4");
 
 	InitializeGlutCallbacks();
 
