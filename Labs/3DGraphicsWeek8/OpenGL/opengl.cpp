@@ -8,11 +8,26 @@
 #include "graphicsmath.h"
 #include "transformations.h"
 #include "camera.h"
+#include "texture.h"
 
 using namespace std;
 
+// NOTE: Move this somewhere else - Prof put this here in his example but it feels out of place
+struct Vertex {
+	Vector3f pos;
+	Vector2f uv;
+
+	Vertex() {}
+	Vertex(Vector3f _pos, Vector2f _uv) {
+		pos = _pos;
+		uv = _uv;
+	}
+};
+
 GLuint VBO;
 GLuint IBO;
+GLuint gSampler;
+Texture* gTexture = NULL;
 
 //Memory position of World Matrix on the GPU
 GLuint gWorldLocation;
@@ -70,13 +85,18 @@ static void RenderSceneCB()
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 	//Bind the Index buffer to the pipeline
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+
+	gTexture->Bind(GL_TEXTURE0);
+
 	//Draw the indices
 	glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
 	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
 
 	glutSwapBuffers();
 }
@@ -175,6 +195,7 @@ static void CompileShaders()
 
 	//Allocate and get memory location of World Matrix on GPU
 	gWorldLocation = glGetUniformLocation(ShaderProgram, "gWorld");
+	gSampler = glGetUniformLocation(ShaderProgram, "gSampler");
 }
 
 static void InitializeGlutCallbacks()
@@ -185,11 +206,11 @@ static void InitializeGlutCallbacks()
 
 static void CreateVertexBuffer()
 {
-	Vector3f Vertices[4];
-	Vertices[0] = Vector3f(-1.0f, -1.0f, 0.0f);
-	Vertices[1] = Vector3f(0.0f, -1.0f, 1.0f);
-	Vertices[2] = Vector3f(1.0f, -1.0f, 0.0f);
-	Vertices[3] = Vector3f(0.0f, 1.0f, 0.0f);
+	Vertex Vertices[4];
+	Vertices[0] = Vertex(Vector3f(-1.0f, -1.0f, 0.0f), Vector2f(0.0f, 0.0f));
+	Vertices[1] = Vertex(Vector3f(0.0f, -1.0f, 1.0f), Vector2f(1.0f, 0.0f));
+	Vertices[2] = Vertex(Vector3f(1.0f, -1.0f, 0.0f), Vector2f(1.0f, 1.0f));
+	Vertices[3] = Vertex(Vector3f(0.0f, 1.0f, 0.0f), Vector2f(0.0f, 1.0f));
 
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -219,7 +240,8 @@ int main(int argc, char** argv)
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize(1024, 768);
 	glutInitWindowPosition(100, 100);
-	glutCreateWindow("Tutorial 03");
+	glutCreateWindow("Texture Tutorial");
+	glutGameModeString("1024x768@32");
 
 	InitializeGlutCallbacks();
 
@@ -233,13 +255,19 @@ int main(int argc, char** argv)
 	}
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
+	glFrontFace(GL_CW);
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
 	CreateVertexBuffer();
 
 	CreateIndexBuffer();
 
 	CompileShaders();
-
+	glUniform1f(gSampler, 0);
+	gTexture = new Texture(GL_TEXTURE_2D, "$(SolutionDir)/Content/test.png");
+	if (!gTexture->Load()) {
+		return 1;
+	}
 	glutMainLoop();
 
 	return 0;
