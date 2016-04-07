@@ -76,7 +76,8 @@ static void RenderSceneCB()
 	Rotation += 0.001f;
 
 	Transform transform;
-	transform.Position(-1.5f, -1.0f, 5.0f);
+	transform.Position(0.f, 0.f, 5.0f);
+	transform.Rotation(0.f, 0.f, 0.f);
 	transform.SetPerspective(90.f, 1024, 768, 1.f, 1000.f);
 	transform.SetCamera(*gameCamera);
 
@@ -85,6 +86,7 @@ static void RenderSceneCB()
 	glUniformMatrix4fv(gWorldLocation, 1, GL_TRUE, (const GLfloat*)transform.GetWorldViewProjectionTransform());
 
 	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid*)12);
@@ -206,10 +208,10 @@ static void InitializeGlutCallbacks()
 static void CreateVertexBuffer()
 {
 	Vertex Vertices[4] = {
-		Vertex(Vector3f(-1.f, -1.f, 0.5773f), Vector2f(0.f, 0.f)),
-		Vertex(Vector3f(0.f, -1.f, -1.15475f), Vector2f(0.5f, 0.f)),
-		Vertex(Vector3f(1.f, -1.f, 0.5773f), Vector2f(1.f, 0.f)),
-		Vertex(Vector3f(0.f, 1.f, 0.f), Vector2f(0.5f, 1.f))
+		Vertex(Vector3f(-1.f, 1.f, 0.f), Vector2f(0.5f, 0.5f)),
+		Vertex(Vector3f(1.f, 1.f, 0.f), Vector2f(0.5f, 0.f)),
+		Vertex(Vector3f(1.f, -1.f, 0.f), Vector2f(1.f, 0.f)),
+		Vertex(Vector3f(-1.f, -1.f, 0.f), Vector2f(0.5f, 1.f))
 	};
 
 	glGenBuffers(1, &VBO);
